@@ -18,9 +18,26 @@ func main() {
 // 4. with: true (part2), and user input
 // the return value of each run is printed to stdout
 func run(part2 bool, input string) any {
+	sumProd := 0
 	// when you're ready to do part 2, remove this "not implemented" block
 	if part2 {
-		return "not implemented"
+		re := regexp.MustCompile(`(do\(\)|don't\(\))|mul\((\d{1,3}),(\d{1,3})\)`)
+		matches := re.FindAllStringSubmatch(input, -1)
+
+		// initialy set true because first occurance of `mul(x,y)` is always enabled without a `do()`
+		enabled := true
+		for _, v := range matches {
+			if len(v[1]) > 0 {
+				if v[1] == "do()" {
+					enabled = true
+				} else if v[1] == "don't()" {
+					enabled = false
+				}
+			} else if len(v[2]) > 0 && len(v[3]) > 0 && enabled {
+				sumProd += atoi(v[2]) * atoi(v[3])
+			}
+		}
+		return sumProd
 	}
 	// solve part 1 here
 	re := regexp.MustCompile(`mul\((\d{1,3}),(\d{1,3})\)`)
@@ -28,11 +45,13 @@ func run(part2 bool, input string) any {
 	// Find all matches
 	matches := re.FindAllStringSubmatch(input, -1)
 
-	sumProd := 0
 	for _, v := range matches {
-		n1, _ := strconv.Atoi(v[1])
-		n2, _ := strconv.Atoi(v[2])
-		sumProd += n1 * n2
+		sumProd += atoi(v[1]) * atoi(v[2])
 	}
 	return sumProd
+}
+
+func atoi(s string) int {
+	n, _ := strconv.Atoi(s)
+	return n
 }
