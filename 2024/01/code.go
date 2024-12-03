@@ -1,7 +1,6 @@
 package main
 
 import (
-	"math"
 	"slices"
 	"strconv"
 	"strings"
@@ -24,10 +23,14 @@ func run(part2 bool, input string) any {
 	var distance int = 0
 	if part2 {
 		// solve part 2 here
+		occ := map[int]int{}
+
+		for _, v := range right {
+			occ[v]++
+		}
 
 		for _, v := range left {
-			occurences := occurences(right, v)
-			distance += occurences * v
+			distance += occ[v] * v
 		}
 		return distance
 	}
@@ -36,39 +39,31 @@ func run(part2 bool, input string) any {
 	slices.Sort(left)
 	slices.Sort(right)
 
-	for i := 0; i < len(left); i++ {
-		var localDist float64 = float64(left[i]) - float64(right[i])
-		distance += int(math.Abs(localDist))
+	for i, v := range left {
+		localDist := v - right[i]
+		distance += abs(localDist)
 	}
 
 	return distance
 }
 
-func convToInt(s string) int {
-	i, _ := strconv.Atoi(s)
-	return i
-}
-
-func splitToSlices(s string) (left []int, right []int) {
+func splitToSlices(s string) (l []int, r []int) {
 	inputSlice := strings.Split(s, "\n")
-	_, _ = left, right
 	for _, v := range inputSlice {
 		splits := strings.Split(v, " ")
 
-		left = append(left, convToInt(strings.Trim(splits[0], " ")))
-		right = append(right, convToInt(strings.Trim(splits[3], " ")))
+		n1, _ := strconv.Atoi(splits[0])
+		n2, _ := strconv.Atoi(splits[3])
+		l = append(l, n1)
+		r = append(r, n2)
 	}
 
-	return left, right
+	return l, r
 }
 
-func occurences(slice []int, value int) int {
-	occurences := 0
-	for _, v := range slice {
-		if v == value {
-			occurences++
-		}
+func abs(x int) int {
+	if x < 0 {
+		return -x
 	}
-
-	return occurences
+	return x
 }
