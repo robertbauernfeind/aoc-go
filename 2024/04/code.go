@@ -23,7 +23,18 @@ func run(part2 bool, input string) any {
 	// when you're ready to do part 2, remove this "not implemented" block
 	lines := strings.Split(input, "\n")
 	if part2 {
-		return "not implemented"
+		drXY := drScan2(lines)
+		dlXY := dlScan2(lines)
+		cnt := 0
+
+		for _, dr := range drXY {
+			for _, dl := range dlXY {
+				if dl[0] == dr[0] && dl[1] == dr[1] {
+					cnt++
+				}
+			}
+		}
+		return cnt
 	}
 	// solve part 1 here
 	cnt := hScan(lines)
@@ -94,6 +105,48 @@ func dlScan(lines []string) int {
 	return cnt
 }
 
+// part 2
+// returns [] x, y
+func drScan2(lines []string) [][]int {
+	cords := [][]int{}
+
+	// row
+	for i := 0; i < len(lines)-2; i++ {
+		// col
+		for j := 0; j < len(lines[i])-2; j++ {
+			mas := string(lines[i][j]) + string(lines[i+1][j+1]) + string(lines[i+2][j+2])
+
+			if isMas(mas) {
+				// middle of MAS
+				cords = append(cords, []int{j + 1, i + 1})
+			}
+		}
+	}
+	return cords
+}
+
+// returns [] x, y
+func dlScan2(lines []string) [][]int {
+	cords := [][]int{}
+
+	// row
+	for i := 2; i < len(lines); i++ {
+		// col
+		for j := 0; j < len(lines[i])-2; j++ {
+			mas := string(lines[i][j]) + string(lines[i-1][j+1]) + string(lines[i-2][j+2])
+
+			if isMas(mas) {
+				cords = append(cords, []int{j + 1, i - 1})
+			}
+		}
+	}
+	return cords
+}
+
 func isXmas(s string) bool {
 	return s == "XMAS" || s == "SAMX"
+}
+
+func isMas(s string) bool {
+	return s == "MAS" || s == "SAM"
 }
