@@ -25,24 +25,40 @@ func run(part2 bool, input string) any {
 	printOrders := strings.Split(printSplits[0], "\n")
 	printUpdates := strings.Split(printSplits[1], "\n")
 
-	// when you're ready to do part 2, remove this "not implemented" block
-	if part2 {
-		return "not implemented"
-	}
-	// solve part 1 here
-	middleSum := 0
+	corr, incorr := [][]string{}, [][]string{}
+
 	for _, v := range printUpdates {
 		updatedPages := strings.Split(v, ",")
-		if correctUpdate(updatedPages, printOrders) {
-			middleIdx := int(math.Round(float64(len(updatedPages))/2) - 1)
-			val, _ := strconv.Atoi(updatedPages[middleIdx])
-			middleSum += val
+		if updateIsCorrect(updatedPages, printOrders) {
+			corr = append(corr, updatedPages)
+		} else {
+			incorr = append(incorr, updatedPages)
 		}
+	}
+
+	middleSum := 0
+	// when you're ready to do part 2, remove this "not implemented" block
+	if part2 {
+		for _, v := range incorr {
+			if correctUpdate(v, printOrders) {
+				middleIdx := int(math.Round(float64(len(v))/2) - 1)
+				val, _ := strconv.Atoi(v[middleIdx])
+				middleSum += val
+			}
+		}
+		return middleSum
+	}
+	// solve part 1 here
+	for _, v := range corr {
+
+		middleIdx := int(math.Round(float64(len(v))/2) - 1)
+		val, _ := strconv.Atoi(v[middleIdx])
+		middleSum += val
 	}
 	return middleSum
 }
 
-func correctUpdate(u []string, printOrders []string) bool {
+func updateIsCorrect(u []string, printOrders []string) bool {
 	for i, p1 := range u {
 		pagesBefore := u[:i]
 		pagesAfer := u[i+1:]
@@ -62,7 +78,52 @@ func correctUpdate(u []string, printOrders []string) bool {
 				return false
 			}
 		}
-		_, _, _ = p1, pagesAfer, pagesBefore
+	}
+	return true
+}
+
+func correctUpdate(u []string, printOrders []string) bool {
+	timeout := 0
+	// timeout to stop for loop if something goes wrong
+	for !updateIsCorrect(u, printOrders) && timeout <= 20 {
+		for i, p1 := range u {
+			pagesBefore := u[:i]
+			pagesAfer := u[i+1:]
+
+			for _, b := range pagesBefore {
+				bef := b + "|" + p1
+				idx := slices.Index(printOrders, bef)
+				if idx == -1 {
+					bef := p1 + "|" + b
+					idx = slices.Index(printOrders, bef)
+
+					if idx == -1 {
+						return false
+					} else {
+						bIdx := slices.Index(u, b)
+						u[i], u[bIdx] = u[bIdx], u[i]
+					}
+				}
+			}
+
+			for _, a := range pagesAfer {
+				aft := p1 + "|" + a
+				idx := slices.Index(printOrders, aft)
+				if idx == -1 {
+					bef := a + "|" + p1
+					idx = slices.Index(printOrders, bef)
+
+					if idx == -1 {
+						return false
+					} else {
+						aIdx := slices.Index(u, a)
+						u[i], u[aIdx] = u[aIdx], u[i]
+					}
+				}
+			}
+		}
+
+		timeout++
 	}
 	return true
 }
