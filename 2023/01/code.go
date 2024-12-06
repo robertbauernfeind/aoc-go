@@ -7,7 +7,10 @@ import (
 	"github.com/jpillora/puzzler/harness/aoc"
 )
 
+var numbers = []string{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine"}
+
 func main() {
+	// common.RunDev(run)
 	aoc.Harness(run)
 }
 
@@ -21,9 +24,33 @@ func run(part2 bool, input string) any {
 	lines := strings.Split(input, "\n")
 	// when you're ready to do part 2, remove this "not implemented" block
 	if part2 {
-		return "not implemented"
+		newLines := []string{}
+		for _, line := range lines {
+			mutableLine := line
+			for i, n := range numbers {
+				noNumberFound := false
+				for !noNumberFound {
+					nIdx := strings.Index(mutableLine, n)
+					if nIdx == -1 {
+						noNumberFound = true
+						continue
+					}
+
+					mutableLine = mutableLine[:nIdx+1] + strconv.Itoa(i+1) + mutableLine[nIdx+2:]
+				}
+				// newLine = strings.ReplaceAll(newLine, n, strconv.Itoa(i+1))
+			}
+
+			newLines = append(newLines, mutableLine)
+		}
+
+		return calibrationSum(newLines)
 	}
-	// solve part 1 here
+
+	return calibrationSum(lines)
+}
+
+func calibrationSum(lines []string) int {
 	sum := 0
 	for _, line := range lines {
 		nums := [2]string{}

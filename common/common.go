@@ -8,10 +8,8 @@ import (
 	"github.com/jpillora/puzzler/harness/aoc/user"
 )
 
-func ReadInputExample() string {
-	wd, _ := os.Getwd()
-	filepath := filepath.Join(wd, "input-example.txt")
-	bytes, err := os.ReadFile(filepath)
+func readInputExample(file string) string {
+	bytes, err := os.ReadFile(file)
 	if err != nil {
 		panic(err)
 	}
@@ -20,6 +18,17 @@ func ReadInputExample() string {
 }
 
 func RunDev(run user.RunFn) {
-	input := ReadInputExample()
-	fmt.Println(run(false, input))
+	wd, _ := os.Getwd()
+	filepath1 := filepath.Join(wd, "input-example.txt")
+	input1 := readInputExample(filepath1)
+	fmt.Println("Part1: ", run(false, input1))
+
+	filepath2 := filepath.Join(wd, "input-example2.txt")
+	_, err := os.Stat(filepath2)
+	input2 := input1
+	if err == nil {
+		input2 = readInputExample(filepath2)
+	}
+
+	fmt.Println("Part2: ", run(true, input2))
 }
