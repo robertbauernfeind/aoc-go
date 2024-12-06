@@ -1,15 +1,14 @@
 package main
 
 import (
+	"aoc-in-go/common"
 	"fmt"
 	"strings"
-
-	"github.com/jpillora/puzzler/harness/aoc"
 )
 
 func main() {
-	// common.RunDev(run)
-	aoc.Harness(run)
+	common.RunDev(run)
+	// aoc.Harness(run)
 }
 
 // on code change, run will be executed 4 times:
@@ -26,7 +25,57 @@ func run(part2 bool, input string) any {
 	}
 	// when you're ready to do part 2, remove this "not implemented" block
 	if part2 {
-		return "not implemented"
+		// simulate initial movement
+		sx, sy := getStartingPos(labLines)
+		movementMap := predictMovement(sx, sy, labLines)
+		simulationMap := [][]string{}
+		for _, line := range movementMap {
+			simLine := append([]string{}, line...)
+			simulationMap = append(simulationMap, simLine)
+		}
+
+		possiblePositionCnt := 0
+
+		for fy := 0; fy < len(movementMap); fy++ {
+			fmt.Println(movementMap[fy])
+			for fx := 0; fx < len(movementMap[0]); fx++ {
+				movements := make(map[string]bool)
+
+				if movementMap[fy][fx] == "X" {
+					simulationMap[fy][fx] = "#"
+
+					rotation := 0
+					posFound := false
+					x, y := fx, fy
+					for !posFound {
+						//x, y, rot
+						state := fmt.Sprintf("%d %d %d", fx, fy, rotation)
+						if movements[state] {
+							possiblePositionCnt++
+							posFound = true
+						} else {
+							movements[state] = true
+							// movementMap[y][x] = "X"
+							nextX, nextY := predictNextMovement(rotation, x, y)
+							if hitsBoundary(simulationMap, nextX, nextY) {
+								if simulationMap[nextY][nextX] == "#" {
+									rotation = rotate(rotation)
+									nextX, nextY = predictNextMovement(rotation, x, y)
+								}
+								simulationMap[nextY][nextX] = "^"
+								x, y = nextX, nextY
+							} else {
+								fmt.Println("RUN THROUGH")
+								// return simulationMap
+							}
+						}
+					}
+					simulationMap[y][x] = "."
+				}
+			}
+		}
+
+		return possiblePositionCnt
 	}
 	// solve part 1 here
 	x, y := getStartingPos(labLines)
