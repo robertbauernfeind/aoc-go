@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc-in-go/common"
+	"fmt"
 	"strings"
 
 	"github.com/jpillora/puzzler/harness/aoc"
@@ -58,14 +59,7 @@ func calculate(a, b int, op byte) int {
 	case '*':
 		calculation = a * b
 	case '|':
-		mul, q := 10, 10
-		for q != 0 {
-			q = b / mul
-			if q > 0 {
-				mul *= 10
-			}
-		}
-		calculation = (a * mul) + b
+		calculation = common.Atoi(fmt.Sprintf("%d%d", a, b))
 	}
 
 	return calculation
